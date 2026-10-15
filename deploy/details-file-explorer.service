@@ -1,0 +1,28 @@
+[Unit]
+Description=Details File Explorer (مستكشف الملفات — تجريبي)
+After=network-online.target mnt-hetzner\x2dstorage.mount hetzner-storage.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=details-explorer
+Group=details-explorer
+WorkingDirectory=/opt/details-file-explorer
+EnvironmentFile=/etc/details-file-explorer/env
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node /opt/details-file-explorer/src/server.js
+Restart=on-failure
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+LimitNOFILE=65535
+
+# Hardening — ملاحظة: بلا ProtectSystem=strict لأن /mnt/hetzner-storage نقطة تركيب SSHFS
+# خارج الجذر الافتراضي المسموح؛ بدلاً منها نُقيّد الكتابة صراحة بمسار واحد فقط.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ReadWritePaths=/mnt/hetzner-storage
+
+[Install]
+WantedBy=multi-user.target
